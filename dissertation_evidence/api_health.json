@@ -1,0 +1,8 @@
+{
+    "status": "healthy",
+    "services": {
+        "database": "healthy",
+        "redis": "healthy",
+        "minio": "healthy"
+    }
+}

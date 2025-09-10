@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud-Native Microservice Anti-Pattern Detection Framework</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 Cloud-Native Microservice Anti-Pattern Detection Framework</h1>
+            <p class="subtitle">AWS Serverless Architecture | Multi-Tool Integration | Validated Performance</p>
+        </header>
+
+        <div class="metrics-row">
+            <div class="metric-card">
+                <h3>Precision</h3>
+                <div class="metric-value" data-value="100">0%</div>
+                <small style="color: #666;">Validated</small>
+            </div>
+            <div class="metric-card">
+                <h3>Recall</h3>
+                <div class="metric-value" data-value="66.7">0%</div>
+                <small style="color: #666;">Validated</small>
+            </div>
+            <div class="metric-card">
+                <h3>F1-Score</h3>
+                <div class="metric-value" data-value="80">0%</div>
+                <small style="color: #666;">Validated</small>
+            </div>
+            <div class="metric-card">
+                <h3>Cost Reduction</h3>
+                <div class="metric-value" data-value="40">0%</div>
+                <small style="color: #666;">Estimated</small>
+            </div>
+        </div>
+
+        <!-- Rest of the HTML remains the same -->
+        <div class="card">
+            <h2>Dataset Selection</h2>
+            <div class="dataset-grid">
+                <div class="dataset-option" data-project="gs-spring-boot">
+                    <h4>gs-spring-boot</h4>
+                    <p>15 files • 2,341 LOC</p>
+                    <div class="dataset-badge">Spring Boot</div>
+                </div>
+                <div class="dataset-option" data-project="spring-petclinic-microservices">
+                    <h4>spring-petclinic</h4>
+                    <p>42 files • 5,123 LOC</p>
+                    <div class="dataset-badge">Microservices</div>
+                </div>
+                <div class="dataset-option" data-project="sock-shop">
+                    <h4>sock-shop</h4>
+                    <p>38 files • 4,567 LOC</p>
+                    <div class="dataset-badge">Polyglot</div>
+                </div>
+                <div class="dataset-option" data-project="eShopOnContainers">
+                    <h4>eShopOnContainers</h4>
+                    <p>67 files • 8,234 LOC</p>
+                    <div class="dataset-badge">.NET</div>
+                </div>
+            </div>
+            <button id="analyzeBtn" onclick="startAnalysis()" disabled>
+                <span class="btn-text">Select a Dataset</span>
+                <div class="spinner"></div>
+            </button>
+        </div>
+
+        <div class="card" id="results-section" style="display: none;">
+            <h2>Anti-Pattern Detection Results</h2>
+            <div id="results-loading" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>Analyzing code patterns...</p>
+            </div>
+            <div id="results-content" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <script src="dashboard.js"></script>
+</body>
+</html>

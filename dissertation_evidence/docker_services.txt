@@ -1,0 +1,9 @@
+NAME                    IMAGE                                               COMMAND                  SERVICE     CREATED          STATUS                  PORTS
+antipattern-api         microservice-antipattern-detector-local-api         "uvicorn main:app --…"   api         14 minutes ago   Up 14 minutes           0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+antipattern-archunit    microservice-antipattern-detector-local-archunit    "/usr/local/bin/mvn-…"   archunit    11 hours ago     Up 11 hours             
+antipattern-dashboard   microservice-antipattern-detector-local-dashboard   "/docker-entrypoint.…"   dashboard   10 hours ago     Up 10 hours             0.0.0.0:3000->80/tcp, [::]:3000->80/tcp
+antipattern-minio       minio/minio:latest                                  "/usr/bin/docker-ent…"   minio       11 hours ago     Up 11 hours (healthy)   0.0.0.0:9000-9001->9000-9001/tcp, [::]:9000-9001->9000-9001/tcp
+antipattern-postgres    postgres:15-alpine                                  "docker-entrypoint.s…"   postgres    11 hours ago     Up 11 hours (healthy)   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+antipattern-redis       redis:7-alpine                                      "docker-entrypoint.s…"   redis       11 hours ago     Up 11 hours (healthy)   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+antipattern-roslyn      microservice-antipattern-detector-local-roslyn      "tail -f /dev/null"      roslyn      11 hours ago     Up 11 hours             
+antipattern-sonarqube   microservice-antipattern-detector-local-sonarqube   "/opt/sonarqube/dock…"   sonarqube   11 hours ago     Up 11 hours             0.0.0.0:9002->9000/tcp, [::]:9002->9000/tcp
