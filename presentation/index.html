@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dissertation Presentation – Microservice Anti-Pattern Detection</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Segoe UI', -apple-system, Arial, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #e2e8f0; min-height: 100vh; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 40px 20px; }
+  h1 { font-size: 34px; margin: 0 0 8px; background: linear-gradient(135deg, #8b9cf4 0%, #a478d6 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .sub { color: #94a3b8; margin: 0 0 6px; font-size: 17px; }
+  .meta { color: #94a3b8; font-size: 14px; margin-bottom: 28px; }
+  .meta a { color: #7dd3fc; }
+  .intro { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 18px 20px; line-height: 1.6; margin-bottom: 26px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; }
+  a.card { display: block; text-decoration: none; color: inherit; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; padding: 20px; transition: transform .2s, background .2s, border-color .2s; }
+  a.card:hover { transform: translateY(-4px); background: rgba(99,102,241,.14); border-color: rgba(99,102,241,.5); }
+  .num { display: inline-block; width: 28px; height: 28px; line-height: 28px; text-align: center; border-radius: 50%; background: #6366f1; color: #fff; font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+  .card h2 { margin: 0 0 6px; font-size: 19px; color: #fff; }
+  .card p { margin: 0; color: #94a3b8; font-size: 14.5px; line-height: 1.5; }
+  .go { display: block; margin-top: 12px; color: #7dd3fc; font-size: 14px; font-weight: 600; }
+  .stats { display: flex; flex-wrap: wrap; gap: 12px; margin: 26px 0 0; }
+  .stat { flex: 1 1 140px; background: rgba(99,102,241,.12); border-radius: 12px; padding: 14px; text-align: center; }
+  .stat b { display: block; font-size: 24px; color: #a5b4fc; }
+  .stat span { font-size: 13px; color: #94a3b8; }
+  .shotrow { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .shotrow a { text-decoration:none; color:#cbd5e1; font-size:13.5px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:12px; overflow:hidden; }
+  .shotrow img { width:100%; display:block; }
+  .shotrow span { display:block; padding:9px 12px; }
+  @media (max-width:640px) { .shotrow { grid-template-columns:1fr; } }
+  footer { margin-top: 34px; color: #64748b; font-size: 13px; text-align: center; }
+  footer a { color: #7dd3fc; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cloud-Native Detection of Microservice Anti-Patterns</h1>
+  <p class="sub">Using static analysis tools and serverless architectures</p>
+  <p class="meta">MSc Software Engineering dissertation · Mahyad Mirzabagheri · Staffordshire University, 2025 ·
+    <a href="https://github.com/Mahyadmi/microservice-antipattern-detector">Source code</a></p>
+
+  <div class="intro">
+    Microservice systems often contain <b>anti-patterns</b>: design mistakes such as services sharing one database or depending on each other so tightly that they must be deployed together.
+    This project combines the ideas of three analysis tools (<b>SonarQube</b>, <b>Roslyn</b> and <b>ArchUnit</b>) in one cloud-native pipeline that finds these problems,
+    merges duplicate findings and produces a single report. The serverless AWS design was prototyped locally with Docker and tested on four open-source projects.
+  </div>
+
+  <div class="grid">
+    <a class="card" href="viva-presentation.html">
+      <span class="num">1</span>
+      <h2>Viva presentation</h2>
+      <p>The 7-slide deck: research gap, architecture, multi-tool integration, implementation, results and conclusions.</p>
+      <span class="go">Open slides →</span>
+    </a>
+    <a class="card" href="viva-summary.html">
+      <span class="num">2</span>
+      <h2>One-page summary</h2>
+      <p>Problem → solution → results on a single page. Good for a quick read or printing.</p>
+      <span class="go">Open summary →</span>
+    </a>
+    <a class="card" href="demo-architecture.html">
+      <span class="num">3</span>
+      <h2>Architecture demo</h2>
+      <p>System design, the 8 Docker containers, the detection flow, results, code structure, and the frontend &amp; backend with screenshots.</p>
+      <span class="go">Open demo →</span>
+    </a>
+    <a class="card" href="semantic-similarity.html">
+      <span class="num">4</span>
+      <h2>Semantic similarity explained</h2>
+      <p>How duplicate findings from different tools are matched by their wording, with a real worked example and runnable Python code.</p>
+      <span class="go">Open explainer →</span>
+    </a>
+  </div>
+
+  <h2 style="margin:30px 0 12px;font-size:20px;color:#fff;">The prototype running</h2>
+  <div class="shotrow">
+    <a href="demo-architecture.html#app"><img src="img/petclinic-2.jpg" alt="Dashboard showing spring-petclinic results"><span>spring-petclinic: 4 anti-patterns</span></a>
+    <a href="demo-architecture.html#app"><img src="img/sock-shop-2.jpg" alt="Dashboard showing sock-shop results"><span>sock-shop: 5 anti-patterns</span></a>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>100%</b><span>precision</span></div>
+    <div class="stat"><b>66.7%</b><span>recall</span></div>
+    <div class="stat"><b>80%</b><span>F1-score</span></div>
+    <div class="stat"><b>4</b><span>real projects tested</span></div>
+    <div class="stat"><b>~£0.04</b><span>per analysis (projected)</span></div>
+  </div>
+
+  <footer>Supervisor: Dr Meriem Zouzou · <a href="https://mahyadmi.github.io">mahyadmi.github.io</a></footer>
+</div>
+</body>
+</html>

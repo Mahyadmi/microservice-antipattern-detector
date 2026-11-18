@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viva Presentation – Cloud-Native Detection of Microservice Anti-Patterns</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            animation: move 25s linear infinite;
+            bottom: -150px;
+        }
+        
+        @keyframes move {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+                border-radius: 0;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+                border-radius: 50%;
+            }
+        }
+        
+        .presentation {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .slide-progress {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .progress-dots {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .dot.active {
+            width: 24px;
+            border-radius: 4px;
+            background: var(--primary);
+        }
+        
+        .slide-number {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-btn:hover:not(:disabled) {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        /* Slides */
+        .slide-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+        
+        .slide {
+            display: none;
+            width: 100%;
+            max-width: 1400px;
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Slide 1 - Title */
+        .title-slide {
+            text-align: center;
+            color: white;
+        }
+        
+        .main-title {
+            font-size: 56px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            color: #94a3b8;
+            margin-bottom: 50px;
+        }
+        
+        .presenter-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .presenter-card h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+        
+        .presenter-card p {
+            font-size: 16px;
+            color: #cbd5e1;
+            margin: 8px 0;
+        }
+        
+        .github-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 12px 24px;
+            background: var(--gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .github-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+        }
+        
+        /* Slide 2 - Research Gap */
+        .gap-slide {
+            color: white;
+        }
+        
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .gaps-visual {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .gap-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .gap-item:nth-child(1) { animation-delay: 0.1s; }
+        .gap-item:nth-child(2) { animation-delay: 0.2s; }
+        .gap-item:nth-child(3) { animation-delay: 0.3s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .gap-item:hover {
+            transform: translateY(-5px);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .gap-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .gap-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .gap-desc {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            animation: countUp 1s ease-out;
+        }
+        
+        @keyframes countUp {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+        
+        /* Slide 3 - Architecture */
+        .arch-slide {
+            color: white;
+        }
+        
+        .architecture-diagram {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .flow-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            z-index: 0;
+            animation: flowLine 2s ease-in-out infinite;
+        }
+        
+        @keyframes flowLine {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .arch-node {
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            min-width: 140px;
+            transition: all 0.3s;
+        }
+        
+        .arch-node:hover {
+            transform: scale(1.1);
+            background: var(--primary);
+        }
+        
+        .arch-node i {
+            font-size: 24px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        
+        .arch-node h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .arch-node p {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+        
+        .tech-chip {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .tech-chip:hover {
+            background: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        /* Slide 4 - Integration */
+        .integration-slide {
+            color: white;
+        }
+        
+        .tools-showcase {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 40px;
+        }
+        
+        .tool-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        }
+        
+        .tool-logo {
+            font-size: 36px;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .tool-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .tool-desc {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        
+        .algorithm-visual {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .algo-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-left: 3px solid var(--accent);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .algo-card:hover {
+            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .algo-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .algo-card p {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        
+        /* Slide 5 - Implementation */
+        .impl-slide {
+            color: white;
+        }
+        
+        .impl-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .impl-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .docker-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .docker-item {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .docker-item:hover {
+            background: rgba(6, 182, 212, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .patterns-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .pattern-pill {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Slide 6 - Results */
+        .results-slide {
+            color: white;
+        }
+        
+        .metrics-display {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .metric-circle {
+            width: 150px;
+            height: 150px;
+            position: relative;
+        }
+        
+        .metric-svg {
+            transform: rotate(-90deg);
+        }
+        
+        .metric-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 10;
+        }
+        
+        .metric-fill {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 10;
+            stroke-linecap: round;
+            animation: fillAnimation 1.5s ease-out;
+        }
+        
+        @keyframes fillAnimation {
+            from {
+                stroke-dashoffset: 440;
+            }
+        }
+        
+        .metric-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        
+        .projects-chart {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        .chart-bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 200px;
+            margin-bottom: 20px;
+        }
+        
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .bar {
+            width: 60px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            animation: growBar 1s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .bar-group:nth-child(1) .bar { height: 40px; animation-delay: 0.1s; }
+        .bar-group:nth-child(2) .bar { height: 80px; animation-delay: 0.2s; }
+        .bar-group:nth-child(3) .bar { height: 100px; animation-delay: 0.3s; }
+        .bar-group:nth-child(4) .bar { height: 120px; animation-delay: 0.4s; }
+        
+        @keyframes growBar {
+            from {
+                height: 0;
+            }
+        }
+        
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 600;
+        }
+        
+        .bar-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        
+        /* Slide 7 - Achievements */
+        .achievements-slide {
+            color: white;
+        }
+        
+        .achievements-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .achievement-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .achievement-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--success) 0%, var(--accent) 100%);
+        }
+        
+        .achievement-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .achievement-list {
+            list-style: none;
+        }
+        
+        .achievement-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+        
+        .achievement-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .impact-box {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .impact-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .impact-text {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+        
+        .src { font-size: 11px; color: #94a3b8; text-align: center; margin-top: 14px; }
+        .hint { position: fixed; bottom: 10px; left: 0; right: 0; text-align: center; color: #64748b; font-size: 12px; z-index: 5; }
+        .home-link { color: #cbd5e1; text-decoration: none; font-size: 13px; margin-left: 16px; }
+        .stat-number.small { font-size: 28px; }
+        @media (max-width: 900px) {
+            body { overflow: auto; height: auto; }
+            .presentation { height: auto; min-height: 100vh; }
+            .slide-container { padding: 20px 14px 50px; align-items: flex-start; }
+            .header { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+            .nav-btn { padding: 8px 12px; }
+            .main-title { font-size: 32px; }
+            .slide-title { font-size: 26px; margin-bottom: 22px; }
+            .gaps-visual, .algorithm-visual, .impl-container, .achievements-container { grid-template-columns: 1fr; }
+            .impact-box { grid-template-columns: 1fr !important; }
+            .tech-grid { grid-template-columns: repeat(3, 1fr); }
+            .flow-diagram, .tools-showcase { flex-direction: column; gap: 12px; }
+            .flow-line { display: none; }
+            .arch-node, .tool-card { width: 100%; margin: 0; }
+            .metrics-display { flex-wrap: wrap; gap: 16px; }
+            .stats-bar { flex-direction: column; gap: 16px; }
+            .bar { width: 36px; }
+            .presenter-card { padding: 24px; }
+        }
+
+        /* Animations for background */
+        .bg-animation span:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+        .bg-animation span:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .bg-animation span:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+        .bg-animation span:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+        .bg-animation span:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
+        .bg-animation span:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
+        .bg-animation span:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
+        .bg-animation span:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
+        .bg-animation span:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
+        .bg-animation span:nth-child(10) { left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s; }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    
+    <div class="presentation">
+        <div class="header">
+            <div class="slide-progress">
+                <div class="progress-dots">
+                    <span class="dot active" onclick="goToSlide(1)"></span>
+                    <span class="dot" onclick="goToSlide(2)"></span>
+                    <span class="dot" onclick="goToSlide(3)"></span>
+                    <span class="dot" onclick="goToSlide(4)"></span>
+                    <span class="dot" onclick="goToSlide(5)"></span>
+                    <span class="dot" onclick="goToSlide(6)"></span>
+                    <span class="dot" onclick="goToSlide(7)"></span>
+                </div>
+                <span class="slide-number">Slide <span id="current">1</span> / 7</span>
+                <a class="home-link" href="index.html">All pages</a>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="previousSlide()" id="prevBtn">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <button class="nav-btn" onclick="nextSlide()" id="nextBtn">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="slide-container">
+            <!-- Slide 1: Title -->
+            <div class="slide active">
+                <div class="title-slide">
+                    <h1 class="main-title">Cloud-Native Detection of Microservice Anti-Patterns</h1>
+                    <p class="subtitle">Using Static Analysis Tools and Serverless Architectures</p>
+                    
+                    <div class="presenter-card">
+                        <h2>Mahyad Mirzabagheri</h2>
+                        <p>MSc Software Engineering</p>
+                        <p>Staffordshire University · September 2025</p>
+                        <p>Supervisor: Dr Meriem Zouzou</p>
+                        <a href="https://github.com/Mahyadmi/microservice-antipattern-detector" target="_blank" class="github-btn">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 2: Research Gap -->
+            <div class="slide">
+                <div class="gap-slide">
+                    <h2 class="slide-title">Research Gap & Problem Identification</h2>
+                    <div class="gaps-visual">
+                        <div class="gap-item">
+                            <div class="gap-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <h3 class="gap-title">No Cloud Integration</h3>
+                            <p class="gap-desc">Analysis tools run on fixed infrastructure and don't use the automatic scaling and pay-per-use cost of serverless platforms</p>
+                        </div>
+                        <div class="gap-item">
+                            <div class="gap-icon"><i class="fas fa-link"></i></div>
+                            <h3 class="gap-title">No Multi-Tool Orchestration</h3>
+                            <p class="gap-desc">SonarQube, Roslyn and ArchUnit work separately, so results are duplicated, conflicting or incomplete</p>
+                        </div>
+                        <div class="gap-item">
+                            <div class="gap-icon"><i class="fas fa-chart-line"></i></div>
+                            <h3 class="gap-title">Limited Validation</h3>
+                            <p class="gap-desc">Most studies test single tools on small proofs of concept, not several real projects</p>
+                        </div>
+                    </div>
+                    <div class="stats-bar">
+                        <div class="stat-item">
+                            <div class="stat-number">58+</div>
+                            <div class="stat-label">Known microservice anti-patterns</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">20–40%</div>
+                            <div class="stat-label">Lower cost with serverless (studies)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Research gaps addressed</div>
+                        </div>
+                    </div>
+                    <p class="src">Sources: Taibi, Lenarduzzi &amp; Pahl (2020); Kumar et al. (2024); Anderson et al. (2023) — see dissertation Chapter 2</p>
+                </div>
+            </div>
+            
+            <!-- Slide 3: Architecture -->
+            <div class="slide">
+                <div class="arch-slide">
+                    <h2 class="slide-title">Proposed Solution: Serverless Architecture</h2>
+                    <p style="text-align:center;color:#94a3b8;margin:-24px 0 24px;">Designed for AWS (Lambda, EventBridge, S3, RDS) · prototype simulated with Docker Compose</p>
+                    <div class="architecture-diagram">
+                        <div class="flow-diagram">
+                            <div class="flow-line"></div>
+                            <div class="arch-node">
+                                <i class="fas fa-broadcast-tower"></i>
+                                <h4>Event Layer</h4>
+                                <p>API / CI/CD triggers</p>
+                            </div>
+                            <div class="arch-node">
+                                <i class="fas fa-cogs"></i>
+                                <h4>Orchestration</h4>
+                                <p>Lambda-style containers</p>
+                            </div>
+                            <div class="arch-node">
+                                <i class="fas fa-microscope"></i>
+                                <h4>Analysis</h4>
+                                <p>Tool concepts run</p>
+                            </div>
+                            <div class="arch-node">
+                                <i class="fas fa-puzzle-piece"></i>
+                                <h4>Integration</h4>
+                                <p>Normalise &amp; merge</p>
+                            </div>
+                            <div class="arch-node">
+                                <i class="fas fa-chart-bar"></i>
+                                <h4>Reporting</h4>
+                                <p>Dashboard & API</p>
+                            </div>
+                        </div>
+                        <div class="tech-grid">
+                            <div class="tech-chip"><i class="fab fa-python"></i> Python</div>
+                            <div class="tech-chip"><i class="fab fa-docker"></i> Docker</div>
+                            <div class="tech-chip"><i class="fas fa-bolt"></i> FastAPI</div>
+                            <div class="tech-chip"><i class="fas fa-database"></i> PostgreSQL</div>
+                            <div class="tech-chip"><i class="fas fa-memory"></i> Redis</div>
+                            <div class="tech-chip"><i class="fas fa-hdd"></i> MinIO</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 4: Integration -->
+            <div class="slide">
+                <div class="integration-slide">
+                    <h2 class="slide-title">Multi-Tool Integration Strategy</h2>
+                    <div class="tools-showcase">
+                        <div class="tool-card">
+                            <div class="tool-logo"><i class="fas fa-code"></i></div>
+                            <h3 class="tool-name">SonarQube</h3>
+                            <p class="tool-desc">Code quality &amp; smells → coupling, granularity</p>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-logo"><i class="fab fa-microsoft"></i></div>
+                            <h3 class="tool-name">Roslyn</h3>
+                            <p class="tool-desc">.NET/C# → service intimacy, idempotency</p>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-logo"><i class="fab fa-java"></i></div>
+                            <h3 class="tool-name">ArchUnit</h3>
+                            <p class="tool-desc">Java architecture → dependencies, layers, cycles</p>
+                        </div>
+                    </div>
+                    <div class="algorithm-visual">
+                        <div class="algo-card">
+                            <h4><i class="fas fa-map-marker-alt"></i> Location Matching</h4>
+                            <p>Same file &amp; line = strongest match (score 1.0); nearby lines score lower</p>
+                        </div>
+                        <div class="algo-card">
+                            <h4><i class="fas fa-fingerprint"></i> Pattern Type</h4>
+                            <p>Findings of the same anti-pattern type are linked</p>
+                        </div>
+                        <div class="algo-card">
+    <h4>
+        <i class="fas fa-brain"></i> 
+        <a href="semantic-similarity.html" 
+           target="_blank" 
+           style="color: inherit; text-decoration: none; border-bottom: 1px dashed #06b6d4;">
+           Semantic Similarity ↗
+        </a>
+    </h4>
+    <p>TF-IDF + cosine similarity on issue descriptions (click for example)</p>
+</div>
+                        <div class="algo-card">
+                            <h4><i class="fas fa-balance-scale"></i> Resolution Rules</h4>
+                            <p>Higher confidence wins · tool expertise · critical first · unclear → human review</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 5: Implementation -->
+            <div class="slide">
+                <div class="impl-slide">
+                    <h2 class="slide-title">Implementation</h2>
+                    <div class="impl-container">
+                        <div class="impl-section">
+                            <h3 class="section-title"><i class="fab fa-docker"></i> Docker Simulation</h3>
+                            <div class="docker-grid">
+                                <div class="docker-item">FastAPI API<br><small>≈ API Gateway + Lambda</small></div>
+                                <div class="docker-item">PostgreSQL<br><small>≈ Amazon RDS</small></div>
+                                <div class="docker-item">MinIO<br><small>≈ Amazon S3</small></div>
+                                <div class="docker-item">Redis<br><small>≈ ElastiCache</small></div>
+                                <div class="docker-item">SonarQube · Roslyn · ArchUnit<br><small>tool containers</small></div>
+                                <div class="docker-item">Dashboard<br><small>HTML/JS via Nginx</small></div>
+                            </div>
+                        </div>
+                        <div class="impl-section">
+                            <h3 class="section-title"><i class="fas fa-search"></i> Patterns Detected (examples)</h3>
+                            <div class="patterns-grid">
+                                <span class="pattern-pill">Hardcoded Connection</span>
+                                <span class="pattern-pill">Hardcoded Endpoints</span>
+                                <span class="pattern-pill">Synchronous Blocking</span>
+                                <span class="pattern-pill">Shared Persistence</span>
+                                <span class="pattern-pill">Distributed Monolith</span>
+                                <span class="pattern-pill">Cyclic Dependencies</span>
+                                <span class="pattern-pill">Missing API Gateway</span>
+                                <span class="pattern-pill">Service Intimacy</span>
+                                <span class="pattern-pill">Missing Idempotency</span>
+                            </div>
+                            <p style="margin-top:16px;font-size:13px;color:#94a3b8;">Real analysis of source code (e.g. connection strings, <code>Thread.sleep</code>, shared databases, imports), not pre-set results.</p>
+                            <a href="demo-architecture.html#app" style="display:inline-block;margin-top:14px;color:#06b6d4;font-weight:600;text-decoration:none;border-bottom:2px solid #06b6d4;">See the dashboard &amp; API running →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 6: Results -->
+            <div class="slide">
+                <div class="results-slide">
+                    <h2 class="slide-title">Validation Results</h2>
+                    <p style="text-align:center;color:#94a3b8;margin:-24px 0 24px;">Preliminary validation: 2 files, 6 known anti-patterns → 4 found, 0 false alarms</p>
+                    <div class="metrics-display">
+                        <div class="metric-circle">
+                            <svg width="150" height="150" class="metric-svg">
+                                <defs>
+                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="75" cy="75" r="70" class="metric-bg"></circle>
+                                <circle cx="75" cy="75" r="70" class="metric-fill" 
+                                        stroke-dasharray="440" stroke-dashoffset="0"></circle>
+                            </svg>
+                            <div class="metric-text">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Precision</div>
+                            </div>
+                        </div>
+                        <div class="metric-circle">
+                            <svg width="150" height="150" class="metric-svg">
+                                <circle cx="75" cy="75" r="70" class="metric-bg"></circle>
+                                <circle cx="75" cy="75" r="70" class="metric-fill" 
+                                        stroke-dasharray="440" stroke-dashoffset="147"></circle>
+                            </svg>
+                            <div class="metric-text">
+                                <div class="metric-value">66.7%</div>
+                                <div class="metric-label">Recall</div>
+                            </div>
+                        </div>
+                        <div class="metric-circle">
+                            <svg width="150" height="150" class="metric-svg">
+                                <circle cx="75" cy="75" r="70" class="metric-bg"></circle>
+                                <circle cx="75" cy="75" r="70" class="metric-fill" 
+                                        stroke-dasharray="440" stroke-dashoffset="88"></circle>
+                            </svg>
+                            <div class="metric-text">
+                                <div class="metric-value">80%</div>
+                                <div class="metric-label">F1-Score</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="projects-chart">
+                        <p style="text-align:center;color:#cbd5e1;margin-bottom:30px;">Anti-patterns detected per project (analysis time)</p>
+                        <div class="chart-bars">
+                            <div class="bar-group">
+                                <div class="bar">
+                                    <span class="bar-value">2</span>
+                                </div>
+                                <span class="bar-label">gs-spring-boot<br>15 files · ~5 s</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar">
+                                    <span class="bar-value">4</span>
+                                </div>
+                                <span class="bar-label">petclinic<br>42 files · ~15 s</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar">
+                                    <span class="bar-value">5</span>
+                                </div>
+                                <span class="bar-label">sock-shop<br>38 files · ~20 s</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar">
+                                    <span class="bar-value">6</span>
+                                </div>
+                                <span class="bar-label">eShopOnContainers<br>67 files · ~35 s</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+<!-- Slide 7: Conclusions & Demonstration Ready -->
+<div class="slide">
+    <div class="achievements-slide">
+       <h2 class="slide-title">Validation Summary &amp; Conclusions</h2>
+        <div class="achievements-container">
+            <div class="achievement-box">
+                <h3 class="achievement-title"><i class="fas fa-check-circle"></i> Validation Results</h3>
+                <ul class="achievement-list">
+                    <li>Tested on 4 real projects (15-67 files)</li>
+                    <li>100% precision achieved (0 false positives)</li>
+                    <li>66.7% recall (4/6 patterns detected)</li>
+                    <li>Time grew roughly linearly with size (~5 s → ~35 s)</li>
+                    <li>2–6 patterns detected per project</li>
+                </ul>
+            </div>
+            <div class="achievement-box">
+                <h3 class="achievement-title"><i class="fas fa-lightbulb"></i> Key Contributions</h3>
+                <ul class="achievement-list">
+                    <li>New cloud-native multi-tool architecture</li>
+                    <li>Docker simulation of AWS serverless (proof of concept)</li>
+                    <li>Normalisation + conflict-resolution design</li>
+                    <li>~£0.04 per analysis (projected AWS cost)</li>
+                    <li>Open source on GitHub</li>
+                </ul>
+            </div>
+        </div>
+        <div class="impact-box" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="text-align: left;">
+                <h4 style="margin-bottom: 10px;"><i class="fas fa-exclamation-triangle"></i> Limitations</h4>
+                <p style="font-size: 14px; line-height: 1.4;">
+                    • Small validation set (2 files, 6 patterns)<br>
+                    • Docker simulation, not real AWS Lambda<br>
+                    • Simplified tool concepts, not full tool APIs
+                </p>
+            </div>
+            <div style="text-align: left;">
+                <h4 style="margin-bottom: 10px;"><i class="fas fa-rocket"></i> Future Work</h4>
+                <p style="font-size: 14px; line-height: 1.4;">
+                    • Deploy to real AWS Lambda<br>
+                    • Full SonarQube/Roslyn/ArchUnit API integration<br>
+                    • Machine learning &amp; more languages (Go, Python)
+                </p>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 18px; display: flex; gap: 28px; justify-content: center; flex-wrap: wrap;">
+            <a href="demo-architecture.html" style="color: #06b6d4; font-size: 17px; font-weight: 600; text-decoration: none; border-bottom: 2px solid #06b6d4;">Architecture demo →</a>
+            <a href="viva-summary.html" style="color: #06b6d4; font-size: 17px; font-weight: 600; text-decoration: none; border-bottom: 2px solid #06b6d4;">One-page summary →</a>
+        </div>
+    </div>
+</div>
+    
+    <div class="hint">Use ← → arrow keys, the buttons, or swipe</div>
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 7;
+        
+        function updateDots() {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide - 1);
+            });
+        }
+        
+        function showSlide(n) {
+            const slides = document.getElementsByClassName('slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (n > totalSlides) currentSlide = 1;
+            if (n < 1) currentSlide = totalSlides;
+            
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active');
+            }
+            
+            slides[currentSlide - 1].classList.add('active');
+            document.getElementById('current').textContent = currentSlide;
+            
+            prevBtn.disabled = currentSlide === 1;
+            nextBtn.disabled = currentSlide === totalSlides;
+            
+            updateDots();
+        }
+        
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+        
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+        
+        function goToSlide(n) {
+            currentSlide = n;
+            showSlide(currentSlide);
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousSlide();
+            }
+            if (e.key >= '1' && e.key <= '7') {
+                goToSlide(parseInt(e.key));
+            }
+        });
+        
+        // Swipe navigation on phones/tablets
+        let touchX = null;
+        document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+        document.addEventListener('touchend', e => {
+            if (touchX === null) return;
+            const dx = e.changedTouches[0].clientX - touchX;
+            if (dx < -60 && currentSlide < totalSlides) nextSlide();
+            if (dx > 60 && currentSlide > 1) previousSlide();
+            touchX = null;
+        });
+
+        // Initialize
+        showSlide(1);
+    </script>
+</body>
+</html>

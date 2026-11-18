@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dissertation Visual Summary – Microservice Anti-Pattern Detection</title>
+<style>
+  @media print { body { margin: 0; background: #fff; } .section { page-break-inside: avoid; } .back { display: none; } }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; padding: 20px; max-width: 1000px; margin: auto; background: #f5f5f7; color: #222; line-height: 1.5; }
+  a { color: #1971c2; }
+  .back { display: inline-block; margin-bottom: 12px; text-decoration: none; font-size: 14px; }
+  .title { text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 22px; }
+  .section { border: 2px solid #333; border-radius: 10px; padding: 20px; margin-bottom: 8px; background: #fff; }
+  .problem { background: #fff5f5; border-color: #e03131; }
+  .solution { background: #f4fcf5; border-color: #2f9e44; }
+  .results { background: #f1f7ff; border-color: #1971c2; }
+  h2 { margin-top: 0; font-size: 21px; }
+  .box { display: inline-block; border: 1px solid #888; padding: 10px 14px; margin: 6px; border-radius: 6px; text-align: center; background: #fff; min-width: 110px; }
+  .arrow { text-align: center; font-size: 30px; color: #888; margin: 4px 0; }
+  ul { margin: 12px 0; padding-left: 22px; } li { margin: 7px 0; }
+  .flow { text-align: center; background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+  .flow .arr { font-size: 18px; color: #555; }
+  .metrics { display: flex; justify-content: space-around; flex-wrap: wrap; margin-top: 12px; }
+  .metric { text-align: center; padding: 14px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,.08); min-width: 140px; margin: 6px; }
+  .metric strong { font-size: 24px; color: #1971c2; display: block; }
+  .metric small { color: #666; }
+  table { width: 100%; margin-top: 10px; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+  th, td { padding: 9px; border-bottom: 1px solid #e3e3e3; text-align: left; }
+  th { background: #e7f0fb; }
+  .achievements { background: #fffbe6; padding: 18px 20px; border-radius: 10px; margin-top: 20px; border: 2px solid #f2c94c; }
+  .tag { background: #ffe066; padding: 2px 7px; font-weight: 700; border-radius: 4px; font-size: 13px; }
+  .story { text-align: center; margin-top: 20px; padding: 14px; background: #fff; border-radius: 8px; }
+  .story span { display: inline-block; margin: 3px 4px; }
+  @media (max-width: 600px) { body { padding: 12px; } .box { min-width: 0; padding: 8px 10px; margin: 4px; } .flow .arr { display:block; } table { font-size: 13px; } th, td { padding: 6px; } .title { font-size: 23px; } }
+  .foot { text-align: center; color: #777; font-size: 13px; margin-top: 18px; }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← All presentation pages</a>
+<div class="title">Microservice Anti-Pattern Detection Framework</div>
+<div class="subtitle">One-page visual summary of the MSc dissertation · Staffordshire University · September 2025</div>
+
+<div class="section problem">
+  <h2>⛔ The problem</h2>
+  <div style="text-align:center;">
+    <div class="box">SonarQube<br><span style="color:#e03131;font-weight:700;">works alone</span></div>
+    <div class="box">Roslyn<br><span style="color:#e03131;font-weight:700;">works alone</span></div>
+    <div class="box">ArchUnit<br><span style="color:#e03131;font-weight:700;">works alone</span></div>
+  </div>
+  <p>Microservices often suffer from <b>anti-patterns</b>: design mistakes such as services sharing one database or being so tightly linked they must be deployed together. Research has catalogued <b>58+ of them</b> (Taibi, Lenarduzzi &amp; Pahl, 2020).</p>
+  <ul>
+    <li><b>Gap 1 – No cloud-native integration:</b> analysis tools run on fixed servers instead of pay-per-use serverless platforms, which studies show can cut costs by 20–40%.</li>
+    <li><b>Gap 2 – No multi-tool orchestration:</b> tools don't share results, so findings are duplicated, conflicting or missed.</li>
+    <li><b>Gap 3 – Limited validation:</b> most studies test one tool on small examples rather than several real projects.</li>
+  </ul>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="section solution">
+  <h2>💡 The solution</h2>
+  <div class="flow">
+    <div style="font-weight:700;color:#2f9e44;margin-bottom:10px;">☁️ Cloud-native, serverless-style architecture</div>
+    <span class="box">Event layer</span><span class="arr">→</span>
+    <span class="box">Orchestration</span><span class="arr">→</span>
+    <span class="box">Analysis</span><span class="arr">→</span>
+    <span class="box">Integration</span><span class="arr">→</span>
+    <span class="box">Reporting</span>
+    <div style="margin-top:12px;"><b>Multi-tool integration:</b> SonarQube + Roslyn + ArchUnit concepts in one pipeline, with one report.</div>
+  </div>
+  <ul>
+    <li><b>Docker simulation of AWS serverless:</b> each container plays the role of a Lambda function or AWS service (PostgreSQL ≈ RDS, MinIO ≈ S3, Redis ≈ ElastiCache), so there were no cloud costs during the research. It was approved by the course leader.</li>
+    <li><b>Real pattern detection</b> on the actual source code of each project, not pre-set answers.</li>
+    <li><b>Normalisation + conflict-resolution design:</b> all tool results are converted into one format, then duplicates are matched by location, pattern type, <a href="semantic-similarity.html">description similarity</a> and timing.</li>
+  </ul>
+</div>
+
+<div class="arrow">↓</div>
+
+<div class="section results">
+  <h2>✓ Results</h2>
+  <div class="metrics">
+    <div class="metric"><strong>100%</strong>Precision<br><small>0 false positives</small></div>
+    <div class="metric"><strong>66.7%</strong>Recall<br><small>4 of 6 known patterns</small></div>
+    <div class="metric"><strong>80%</strong>F1-score<br><small>balance of the two</small></div>
+    <div class="metric"><strong>~£0.04</strong>per analysis<br><small>projected AWS cost</small></div>
+  </div>
+  <p style="font-size:14px;color:#555;">Precision/recall come from a preliminary validation on 2 files with 6 known anti-patterns. The cost is projected from AWS pricing: about £42 a year for 20 analyses a week, compared with £500+ a year for dedicated infrastructure.</p>
+  <table>
+    <tr><th>Project tested</th><th>Size</th><th>Patterns found</th><th>Time</th></tr>
+    <tr><td><b>gs-spring-boot</b> (Java)</td><td>15 files</td><td>2</td><td>~5 s</td></tr>
+    <tr><td><b>spring-petclinic-microservices</b> (Java)</td><td>42 files</td><td>4</td><td>~15 s</td></tr>
+    <tr><td><b>sock-shop</b> (Java, Node.js, Go)</td><td>38 files</td><td>5</td><td>~20 s</td></tr>
+    <tr><td><b>eShopOnContainers</b> (.NET)</td><td>67 files</td><td>6</td><td>~35 s</td></tr>
+  </table>
+  <p style="font-size:14px;color:#555;">Analysis time grew roughly in line with project size, not exponentially.</p>
+</div>
+
+<div class="achievements">
+  <h3 style="margin-top:0;">🎯 Key contributions</h3>
+  <ul style="margin:0;">
+    <li><span class="tag">NEW</span> cloud-native architecture that orchestrates several static-analysis tools in one pipeline</li>
+    <li><span class="tag">PROOF OF CONCEPT</span> Docker-based simulation of AWS serverless for analysis workloads</li>
+    <li><span class="tag">RELIABLE</span> conservative detection with zero false positives in validation</li>
+    <li><span class="tag">OPEN SOURCE</span> <a href="https://github.com/Mahyadmi/microservice-antipattern-detector">full code on GitHub</a></li>
+  </ul>
+  <p style="margin:12px 0 0;font-size:14px;"><b>Honest limits:</b> simplified tool concepts rather than full SonarQube/Roslyn/ArchUnit API integration; small validation set; Docker doesn't reproduce Lambda cold starts or scaling limits.</p>
+</div>
+
+<div class="story">
+  <b>The story:</b>
+  <span>Found 3 research gaps</span> → <span>Designed the architecture</span> → <span>Built a working prototype</span> → <span>Tested on 4 real projects</span> → <span>Shared it as open source</span>
+</div>
+
+<p class="foot">Mahyad Mirzabagheri · MSc Software Engineering · Supervisor: Dr Meriem Zouzou</p>
+</body>
+</html>

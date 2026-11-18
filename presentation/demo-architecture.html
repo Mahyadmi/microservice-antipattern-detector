@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Demo – Microservice Anti-Pattern Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .tab.active {
+            background: white;
+            color: #764ba2;
+        }
+        
+        .content {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            min-height: 500px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Architecture Diagram */
+        .architecture-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .flow-arrow {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            z-index: 0;
+        }
+        
+        .arch-component {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            width: 180px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .arch-component:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .arch-component h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .arch-component p {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* Docker Containers */
+        .docker-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .docker-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .docker-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .docker-container h4 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .docker-container .port {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+        
+        /* Code Flow */
+        .code-flow {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .code-flow h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-content code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* Results Display */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+        
+        .result-card:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+        
+        .result-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .metric-label {
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        /* File Structure */
+        .file-tree {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .file-tree ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .file-tree li {
+            margin: 5px 0;
+        }
+        
+        .folder {
+            color: #fbd38d;
+        }
+        
+        .file {
+            color: #90cdf4;
+        }
+        
+        .highlight-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s;
+        }
+        
+        .highlight-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        .back { display:inline-block; color:#fff; text-decoration:none; font-size:14px; margin-bottom:10px; opacity:.9; }
+        .note { background:#eef2ff; border-left:4px solid #667eea; padding:12px 16px; border-radius:6px; font-size:14px; margin:18px 0; }
+        .tag-plan { display:inline-block; background:#fff3bf; color:#7a5b00; border-radius:10px; padding:1px 8px; font-size:11px; margin-top:6px; }
+        .fb-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:20px 0; }
+        .fb-box { background:#f8f9fa; border-radius:10px; padding:20px; border-top:4px solid #667eea; }
+        .fb-box h3 { color:#667eea; margin-bottom:10px; font-size:18px; }
+        .fb-box ul { padding-left:18px; } .fb-box li { margin:6px 0; font-size:14px; }
+        .api-table { width:100%; border-collapse:collapse; font-size:14px; margin-top:8px; }
+        .api-table td { padding:7px 8px; border-bottom:1px solid #e3e6ea; }
+        .api-table code { background:#e9ecef; padding:2px 6px; border-radius:3px; font-size:13px; }
+        .verb { font-weight:700; font-size:12px; padding:2px 7px; border-radius:4px; color:#fff; }
+        .get { background:#2f9e44; } .post { background:#1971c2; }
+        .shots { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:14px; }
+        .shot { background:#f8f9fa; border-radius:10px; overflow:hidden; border:1px solid #e3e6ea; }
+        .shot a { display:block; } .shot img { width:100%; display:block; }
+        .shot p { padding:10px 12px; font-size:13.5px; color:#444; }
+        .shot b { color:#667eea; }
+        @media (max-width: 900px) {
+            .fb-grid, .shots { grid-template-columns: minmax(0,1fr); }
+            .fb-box { padding: 14px; }
+            .api-table td { padding: 6px 4px; font-size: 12.5px; }
+            .fb-box code { word-break: break-all; }
+            .architecture-flow { flex-direction: column; gap: 14px; }
+            .flow-arrow { display: none; }
+            .arch-component { width: 100%; }
+            .docker-grid { grid-template-columns: repeat(2, 1fr); }
+            .results-grid { grid-template-columns: 1fr; }
+            .tabs { flex-wrap: wrap; }
+            .content { padding: 20px; }
+            .header h1 { font-size: 26px; }
+            .file-tree { font-size: 12px; overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a class="back" href="index.html">← All presentation pages</a>
+        <div class="header">
+            <h1>Microservice Anti-Pattern Detection Framework</h1>
+            <p>Architecture &amp; implementation walkthrough · MSc dissertation prototype</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showSection('architecture', this)">Architecture</button>
+            <button class="tab" onclick="showSection('docker', this)">Docker Setup</button>
+            <button class="tab" onclick="showSection('flow', this)">Detection Flow</button>
+            <button class="tab" onclick="showSection('results', this)">Results</button>
+            <button class="tab" onclick="showSection('code', this)">Code Structure</button>
+            <button class="tab" onclick="showSection('app', this)">Frontend &amp; Backend</button>
+        </div>
+        
+        <div class="content">
+            <!-- Architecture Section -->
+            <div id="architecture" class="section active">
+                <h2 style="color: #667eea; margin-bottom: 20px;">System Architecture</h2>
+                <p style="margin-bottom: 10px;">The design targets AWS serverless (Lambda, EventBridge, S3, RDS). The prototype simulates it locally with Docker Compose: each container plays the part of an AWS service, so it ran without cloud costs.</p>
+                
+                <div class="architecture-flow">
+                    <div class="flow-arrow"></div>
+                    <div class="arch-component">
+                        <h3>Input Layer</h3>
+                        <p>REST API upload<br>(CI/CD webhook in design)</p>
+                    </div>
+                    <div class="arch-component">
+                        <h3>API Gateway</h3>
+                        <p>FastAPI<br>Port: 8000</p>
+                    </div>
+                    <div class="arch-component">
+                        <h3>Analysis Engine</h3>
+                        <p>Pattern Detection<br>Tool Orchestration</p>
+                    </div>
+                    <div class="arch-component">
+                        <h3>Storage</h3>
+                        <p>PostgreSQL<br>MinIO S3</p>
+                    </div>
+                    <div class="arch-component">
+                        <h3>Dashboard</h3>
+                        <p>HTML/JS (Nginx)<br>Port: 3000</p>
+                    </div>
+                </div>
+                
+                <div class="code-flow">
+                    <h4>Key Components</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>✅ Multi-tool integration (SonarQube, Roslyn, ArchUnit concepts)</li>
+                        <li>✅ Result normalisation into one common issue format</li>
+                        <li>✅ Conflict-resolution design: <a href="semantic-similarity.html">semantic similarity</a>, location &amp; pattern-type matching</li>
+                        <li>✅ Unified reporting interface</li>
+                        <li>✅ RESTful API for CI/CD integration</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Docker Section -->
+            <div id="docker" class="section">
+                <h2 style="color: #667eea; margin-bottom: 10px;">Docker Containers (simulating AWS services)</h2><p style="margin-bottom:10px;color:#555;">8 containers defined in <code>docker-compose.yml</code>. Started with one command: <code>docker-compose up -d</code></p>
+                <div class="docker-grid">
+                    <div class="docker-container">
+                        <h4>🔌 API Service</h4>
+                        <p>FastAPI backend<br><small>≈ API Gateway + Lambda</small></p>
+                        <span class="port">Port: 8000</span>
+                    </div>
+                    <div class="docker-container">
+                        <h4>📊 Dashboard</h4>
+                        <p>HTML/JS via Nginx</p>
+                        <span class="port">Port: 3000</span>
+                    </div>
+                    <div class="docker-container">
+                        <h4>🗄️ PostgreSQL</h4>
+                        <p>Results &amp; metadata<br><small>≈ Amazon RDS</small></p>
+                        <span class="port">Port: 5432</span>
+                    </div>
+                    <div class="docker-container">
+                        <h4>📦 MinIO</h4>
+                        <p>Artifact storage<br><small>≈ Amazon S3</small></p>
+                        <span class="port">Port: 9000</span>
+                    </div>
+                    <div class="docker-container">
+                        <h4>🔍 SonarQube</h4>
+                        <p>Code Analysis</p>
+                        <span class="port">Port: 9002</span>
+                    </div>
+                    <div class="docker-container">
+                        <h4>⚡ Redis</h4>
+                        <p>Cache &amp; sessions<br><small>≈ ElastiCache</small></p>
+                        <span class="port">Port: 6379</span>
+                    </div>
+                    <div class="docker-container">
+                        <h4>🛠️ Roslyn</h4>
+                        <p>.NET Analysis</p>
+                        <span class="port">Tool container</span>
+                    </div>
+                    <div class="docker-container">
+                        <h4>☕ ArchUnit</h4>
+                        <p>Java Analysis</p>
+                        <span class="port">Tool container</span>
+                    </div>
+                </div>
+                <div class="note">The containers ran on the developer machine during the project. This page is a static walkthrough, so it doesn't show live status.</div>
+            </div>
+            
+            <!-- Flow Section -->
+            <div id="flow" class="section">
+                <h2 style="color: #667eea; margin-bottom: 20px;">Detection Flow</h2>
+                <div class="code-flow">
+                    <h4>Analysis Pipeline</h4>
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <strong>Project Upload</strong><br>
+                            A project is submitted via <code>POST /api/analysis</code> (FastAPI)
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <strong>Tool Execution</strong><br>
+                            SonarQube, Roslyn and ArchUnit concepts analyse the code (simplified implementations)
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <strong>Pattern Detection</strong><br>
+                            Real code analysis in <code>simple_real_detector.py</code> and <code>dataset_specific_analyzer.py</code>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <strong>Result Normalization</strong><br>
+                            Each finding converted to one schema: type, severity, file &amp; line, description, fix, confidence (0–1)
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <strong>Conflict Resolution</strong><br>
+                            Design: match duplicates by location, pattern type, <a href="semantic-similarity.html">description similarity</a> and timing; keep the higher-confidence result
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <strong>Results Display</strong><br>
+                            Results via <code>GET /api/analysis/{id}/results</code> and the dashboard at <code>localhost:3000</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Section -->
+            <div id="results" class="section">
+                <h2 style="color: #667eea; margin-bottom: 20px;">Validation Results</h2>
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h4>Detection Metrics <small style="color:#888;font-weight:normal;">(2 files, 6 known patterns)</small></h4>
+                        <div class="metric">
+                            <span class="metric-label">Precision:</span>
+                            <span class="metric-value">100%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Recall:</span>
+                            <span class="metric-value">66.7%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">F1-Score:</span>
+                            <span class="metric-value">80%</span>
+                        </div>
+                    </div>
+                    <div class="result-card">
+                        <h4>Performance</h4>
+                        <div class="metric">
+                            <span class="metric-label">Execution time:</span>
+                            <span class="metric-value">~5–35 s per project</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Cost per analysis (projected):</span>
+                            <span class="metric-value">~£0.04</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Yearly, 20 runs/week (projected):</span>
+                            <span class="metric-value">~£42 vs £500+</span>
+                        </div>
+                    </div>
+                    <div class="result-card">
+                        <h4>Example Patterns Detected</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>✅ Hardcoded connections, endpoints &amp; credentials</li>
+                            <li>✅ Synchronous blocking</li>
+                            <li>✅ Shared persistence</li>
+                            <li>✅ Distributed monolith</li>
+                            <li>✅ Cyclic dependencies / missing API gateway</li>
+                            <li>✅ Inappropriate service intimacy / missing idempotency</li>
+                            <li style="color:#a33;margin-top:6px;">✗ Missed in validation: God Service, hardcoded credentials (need deeper analysis)</li>
+                        </ul>
+                    </div>
+                    <div class="result-card">
+                        <h4>Test Projects</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>📁 gs-spring-boot (15 files) → 2 patterns, ~5 s</li>
+                            <li>📁 spring-petclinic-microservices (42 files) → 4 patterns, ~15 s</li>
+                            <li>📁 sock-shop (38 files, polyglot) → 5 patterns, ~20 s</li>
+                            <li>📁 eShopOnContainers (67 files, .NET) → 6 patterns, ~35 s</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Code Structure Section -->
+            <div id="code" class="section">
+                <h2 style="color: #667eea; margin-bottom: 20px;">Code Structure</h2>
+                <div class="file-tree">
+<pre>
+<span class="folder">📁 microservice-antipattern-detector/</span>
+├── <span class="file">📄 docker-compose.yml</span> (Container orchestration)
+├── <span class="file">📄 README.md</span>
+├── <span class="folder">📁 services/</span>
+│   ├── <span class="folder">📁 api/</span> (Main API service)
+│   │   ├── <span class="file">📄 Dockerfile</span>
+│   │   ├── <span class="file">📄 requirements.txt</span>
+│   │   └── <span class="folder">📁 app/</span>
+│   │       ├── <span class="file">📄 main.py</span> (FastAPI application, API endpoints)
+│   │       ├── <span class="file">📄 real_integrated_analyzer.py</span> (Main analyzer)
+│   │       ├── <span class="file">📄 simple_real_detector.py</span> (Pattern detection)
+│   │       ├── <span class="file">📄 dataset_specific_analyzer.py</span> (Dataset patterns)
+│   │       ├── <span class="file">📄 sonarqube_real.py · archunit_real.py · roslyn_simple.py</span> (Tool concepts)
+│   │       └── <span class="folder">📁 sample-microservice/</span> (Test files)
+│   ├── <span class="folder">📁 dashboard/</span> (Web interface)
+│   │   ├── <span class="file">📄 Dockerfile</span>
+│   │   └── <span class="folder">📁 src/</span>
+│   │       ├── <span class="file">📄 index.html</span>
+│   │       ├── <span class="file">📄 dashboard.js</span>
+│   │       └── <span class="file">📄 styles.css</span>
+│   ├── <span class="folder">📁 sonarqube/</span> (SonarQube container)
+│   ├── <span class="folder">📁 archunit/</span> (ArchUnit container)
+│   └── <span class="folder">📁 roslyn/</span> (Roslyn container)
+└── <span class="folder">📁 validation/</span> (Validation results)
+    ├── <span class="file">📄 simple_validation.py</span>
+    └── <span class="file">📄 validation_summary.md</span>
+</pre>
+                </div>
+                <div class="code-flow" style="margin-top: 20px;">
+                    <h4>Key Detection Algorithms (in simple_real_detector.py)</h4>
+                    <ul style="padding-left: 20px;">
+                        <li><strong>Keyword Matching:</strong> Detects hardcoded connections and database patterns</li>
+                        <li><strong>Pattern Analysis:</strong> Identifies synchronous blocking operations</li>
+                        <li><strong>Regular Expressions:</strong> Finds credentials and method counts</li>
+                        <li><strong>Dependency Analysis:</strong> Detects circular dependencies between services</li>
+                        <li><strong>Complexity Metrics:</strong> Identifies god services (too many methods/dependencies)</li>
+                    </ul>
+                    <div style="background: #e9ecef; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                        <strong>Implementation Files:</strong><br>
+                        • <code>simple_real_detector.py</code> - Core detection algorithms<br>
+                        • <code>real_integrated_analyzer.py</code> - Orchestrates detection<br>
+                        • <code>dataset_specific_analyzer.py</code> - Handles known test datasets
+                    </div>
+                </div>
+            </div>
+
+            <!-- Frontend & Backend Section -->
+            <div id="app" class="section">
+                <h2 style="color: #667eea; margin-bottom: 10px;">Frontend &amp; Backend</h2>
+                <p style="color:#555;">The prototype has a web dashboard (frontend) that talks to a FastAPI service (backend). The screenshots show it running locally on four real projects.</p>
+                <div class="fb-grid">
+                    <div class="fb-box">
+                        <h3>🖥️ Frontend: dashboard</h3>
+                        <ul>
+                            <li>Plain <b>HTML, CSS and JavaScript</b> (<code>services/dashboard/src</code>)</li>
+                            <li>Served by <b>Nginx</b> in its own container at <code>localhost:3000</code></li>
+                            <li>Shows the headline metrics, lets you pick one of the 4 test projects, and starts the analysis</li>
+                            <li>Lists each finding with its <b>severity</b>, <b>tool</b>, <b>file &amp; line</b> and a <b>suggested fix</b></li>
+                        </ul>
+                    </div>
+                    <div class="fb-box">
+                        <h3>⚙️ Backend: REST API</h3>
+                        <ul>
+                            <li><b>Python + FastAPI</b> (<code>services/api/app/main.py</code>) at <code>localhost:8000</code></li>
+                            <li>Plays the role of API Gateway + Lambda in the AWS design</li>
+                            <li>Runs the detectors and returns results as JSON</li>
+                        </ul>
+                        <table class="api-table">
+                            <tr><td><span class="verb get">GET</span></td><td><code>/api/health</code></td><td>Is the service up?</td></tr>
+                            <tr><td><span class="verb post">POST</span></td><td><code>/api/analysis</code></td><td>Start an analysis</td></tr>
+                            <tr><td><span class="verb get">GET</span></td><td><code>/api/analysis/{id}</code></td><td>Analysis status</td></tr>
+                            <tr><td><span class="verb get">GET</span></td><td><code>/api/analysis/{id}/results</code></td><td>Detected anti-patterns</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <h3 style="color:#667eea;margin-top:10px;">Screenshots: the dashboard on each test project</h3>
+                <p style="color:#777;font-size:13px;">Click any image to open it full size.</p>
+                <div class="shots">
+                    <div class="shot"><a href="img/gs-spring-boot-1.jpg" target="_blank"><img src="img/gs-spring-boot-1.jpg" alt="Dashboard with gs-spring-boot selected" loading="lazy"></a><p><b>gs-spring-boot:</b> dashboard with project selection and headline metrics</p></div>
+                    <div class="shot"><a href="img/gs-spring-boot-2.jpg" target="_blank"><img src="img/gs-spring-boot-2.jpg" alt="gs-spring-boot results" loading="lazy"></a><p><b>gs-spring-boot → 2 findings:</b> hardcoded connection, synchronous blocking</p></div>
+                    <div class="shot"><a href="img/petclinic-1.jpg" target="_blank"><img src="img/petclinic-1.jpg" alt="Dashboard with spring-petclinic selected" loading="lazy"></a><p><b>spring-petclinic-microservices:</b> analysis started</p></div>
+                    <div class="shot"><a href="img/petclinic-2.jpg" target="_blank"><img src="img/petclinic-2.jpg" alt="spring-petclinic results" loading="lazy"></a><p><b>spring-petclinic → 4 findings:</b> shared persistence, distributed monolith, missing circuit breaker, hardcoded endpoints</p></div>
+                    <div class="shot"><a href="img/sock-shop-1.jpg" target="_blank"><img src="img/sock-shop-1.jpg" alt="Dashboard with sock-shop selected" loading="lazy"></a><p><b>sock-shop</b> (Java, Node.js, Go): analysis started</p></div>
+                    <div class="shot"><a href="img/sock-shop-2.jpg" target="_blank"><img src="img/sock-shop-2.jpg" alt="sock-shop results" loading="lazy"></a><p><b>sock-shop → 5 findings:</b> no API gateway, cyclic dependencies, hardcoded credentials, missing health check, synchronous communication</p></div>
+                    <div class="shot"><a href="img/eshop-1.jpg" target="_blank"><img src="img/eshop-1.jpg" alt="Dashboard with eShopOnContainers selected" loading="lazy"></a><p><b>eShopOnContainers</b> (.NET): analysis started</p></div>
+                    <div class="shot"><a href="img/eshop-2.jpg" target="_blank"><img src="img/eshop-2.jpg" alt="eShopOnContainers results" loading="lazy"></a><p><b>eShopOnContainers → 6 findings</b>, incl. Roslyn-concept checks: service intimacy, missing idempotency, shared libraries, data exposure</p></div>
+                </div>
+            </div>
+        </div>
+        <p style="text-align:center;color:#fff;opacity:.85;font-size:13px;margin-top:18px;">Mahyad Mirzabagheri · MSc Software Engineering, Staffordshire University · <a style="color:#fff;" href="https://github.com/Mahyadmi/microservice-antipattern-detector">Source code on GitHub</a></p>
+    </div>
+    
+    <script>
+        function showSection(sectionName, btn) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Highlight selected tab
+            btn.classList.add('active');
+        }
+        if (location.hash) {
+            const id = location.hash.slice(1);
+            const btn = [...document.querySelectorAll('.tab')].find(b => b.getAttribute('onclick').includes("'" + id + "'"));
+            if (btn && document.getElementById(id)) showSection(id, btn);
+        }
+    </script>
+</body>
+</html>

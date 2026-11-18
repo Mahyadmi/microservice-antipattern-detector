@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semantic Similarity – Merging Duplicate Findings</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f5f5f7; color: #222; line-height: 1.55; }
+  a { color: #5a67d8; }
+  .back { display: inline-block; margin-bottom: 14px; text-decoration: none; font-size: 14px; }
+  h1 { text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 22px; border-radius: 12px; margin: 0 0 8px; font-size: 26px; }
+  .lead { text-align: center; color: #555; margin: 0 0 20px; }
+  .card { background: #fff; border-radius: 12px; padding: 22px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,.07); }
+  h2 { margin-top: 0; font-size: 21px; color: #333; }
+  .note { background: #eef2ff; border-left: 4px solid #667eea; padding: 12px 16px; border-radius: 6px; font-size: 14.5px; }
+  .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 14px 0; }
+  .tool { border: 2px solid #e2e2ea; border-radius: 10px; padding: 14px; }
+  .tool b { color: #5a67d8; display: block; margin-bottom: 4px; }
+  .tool i { color: #444; }
+  .tool small { display: block; margin-top: 6px; color: #777; }
+  .step { margin: 18px 0; padding: 14px 16px; border-left: 4px solid #667eea; background: #f8f9fb; border-radius: 0 8px 8px 0; }
+  .step h3 { margin: 0 0 8px; font-size: 17px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th, td { padding: 9px 10px; border-bottom: 1px solid #e6e6ee; text-align: left; vertical-align: top; }
+  th { background: #f3f3f8; }
+  .pill { display: inline-block; padding: 3px 12px; border-radius: 20px; font-weight: 600; color: #fff; }
+  .hi { background: #2f9e44; } .lo { background: #e8590c; }
+  .code { background: #1f2430; color: #d6deeb; border-radius: 8px; padding: 14px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 13.5px; }
+  .code .c { color: #7f8ca3; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .ok { background: #ebfbee; border: 2px solid #b2f2bb; border-radius: 10px; padding: 14px; }
+  .warn { background: #fff4e6; border: 2px solid #ffd8a8; border-radius: 10px; padding: 14px; }
+  .ok h3, .warn h3 { margin: 0 0 6px; font-size: 16px; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } h1 { font-size: 21px; } }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← All presentation pages</a>
+<h1>Semantic Similarity: spotting the same issue described in different words</h1>
+<p class="lead">One of the four signals the framework's conflict-resolution design uses to merge duplicate findings from different tools.</p>
+
+<div class="card">
+  <div class="note">
+    <b>Where this fits:</b> the dissertation (Section 4.3.3) designs a correlation algorithm with four signals:
+    <b>location</b>, <b>anti-pattern type</b>, <b>semantic similarity</b> of the descriptions, and <b>timing</b> (found in the same run).
+    The prototype uses simplified tool concepts, so this page explains how the semantic step works using a small, real example.
+    All scores below were calculated with scikit-learn, not estimated.
+  </div>
+</div>
+
+<div class="card">
+  <h2>1. The problem: one issue, several reports</h2>
+  <p>Each tool writes its own message. Without matching, the developer gets the same problem reported twice and has to work out by hand that it's a duplicate.</p>
+  <div class="tools">
+    <div class="tool"><b>Finding A: SonarQube concept</b><i>"Hardcoded database connection detected in UserService"</i><small>UserService.java · line 4</small></div>
+    <div class="tool"><b>Finding B: ArchUnit concept</b><i>"Database connection string is hardcoded in UserService"</i><small>UserService.java · line 4</small></div>
+    <div class="tool"><b>Finding C: SonarQube concept</b><i>"Synchronous blocking operation detected in UserService"</i><small>UserService.java · line 7</small></div>
+  </div>
+  <p>A and B are the same problem. C is a different one, even though it's in the same file.</p>
+</div>
+
+<div class="card">
+  <h2>2. How the matching works</h2>
+  <div class="step">
+    <h3>Step 1: Turn each description into numbers (TF-IDF)</h3>
+    <p>TF-IDF gives every word a weight. Words that appear in only some descriptions (<i>hardcoded</i>, <i>connection</i>, <i>blocking</i>) get high weights, and very common words (<i>is</i>, <i>in</i>, <i>the</i>) are removed. Each description becomes a list of word weights, called a vector.</p>
+  </div>
+  <div class="step">
+    <h3>Step 2: Compare the vectors (cosine similarity)</h3>
+    <p>Cosine similarity measures how closely two vectors point the same way: <b>1.0</b> = identical wording, <b>0</b> = no words in common.</p>
+    <table>
+      <tr><th>Pair</th><th>Cosine similarity</th><th>Result (example threshold 0.7)</th></tr>
+      <tr><td>A vs B: same issue</td><td><span class="pill hi">0.73</span></td><td>Above threshold → treat as one issue</td></tr>
+      <tr><td>A vs C: different issue</td><td><span class="pill lo">0.29</span></td><td>Below threshold → keep separate</td></tr>
+      <tr><td>B vs C: different issue</td><td><span class="pill lo">0.10</span></td><td>Below threshold → keep separate</td></tr>
+    </table>
+  </div>
+  <div class="step">
+    <h3>Step 3: Combine it with the other signals</h3>
+    <p>Text similarity is never used on its own. A and B also point to the <b>same file and line</b> and the <b>same anti-pattern type</b>, so the evidence agrees. The design's resolution rules then decide what is shown:</p>
+    <ul>
+      <li>keep the finding with the <b>higher confidence score</b></li>
+      <li>prefer the tool with the <b>right expertise</b> (ArchUnit for architecture, SonarQube for code quality)</li>
+      <li>a <b>critical</b> finding always beats a lower-severity one</li>
+      <li>unclear cases are <b>flagged for human review</b></li>
+    </ul>
+    <p><b>Result:</b> the developer sees <b>2 issues</b> (hardcoded connection, synchronous blocking) instead of 3, and the merged issue notes that two tools agree.</p>
+  </div>
+</div>
+
+<div class="card">
+  <h2>3. Python code (runs as shown)</h2>
+<pre class="code"><span class="c"># pip install scikit-learn</span>
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+def find_similar_issues(descriptions, threshold=0.7):
+    <span class="c"># Step 1: descriptions -> TF-IDF vectors (common English words removed)</span>
+    vectors = TfidfVectorizer(stop_words="english").fit_transform(descriptions)
+
+    <span class="c"># Step 2: similarity of every pair</span>
+    scores = cosine_similarity(vectors)
+
+    <span class="c"># Step 3: pairs above the threshold are candidate duplicates</span>
+    return [(i, j, round(float(scores[i][j]), 2))
+            for i in range(len(descriptions))
+            for j in range(i + 1, len(descriptions))
+            if scores[i][j] >= threshold]
+
+findings = [
+    "Hardcoded database connection detected in UserService",
+    "Database connection string is hardcoded in UserService",
+    "Synchronous blocking operation detected in UserService",
+]
+print(find_similar_issues(findings))   <span class="c"># [(0, 1, 0.73)]</span></pre>
+</div>
+
+<div class="card">
+  <h2>4. Strengths and limits</h2>
+  <div class="grid2">
+    <div class="ok">
+      <h3>✅ Works well when…</h3>
+      Tools use overlapping words for the same problem ("hardcoded", "connection"). It's fast, needs no training data, and is easy to explain.
+    </div>
+    <div class="warn">
+      <h3>⚠️ Struggles when…</h3>
+      Tools use <b>synonyms</b> with no words in common. For example, "Excessive coupling between services" vs "Services are tightly interconnected" scores only <b>0.19</b>. That's why location and pattern type are also used, and why embedding-based NLP (a machine-learning model) is listed as future work.
+    </div>
+  </div>
+</div>
+
+<p style="text-align:center;color:#777;font-size:13px;">Mahyad Mirzabagheri · MSc Software Engineering, Staffordshire University ·
+<a href="https://github.com/Mahyadmi/microservice-antipattern-detector">Source code on GitHub</a></p>
+</body>
+</html>

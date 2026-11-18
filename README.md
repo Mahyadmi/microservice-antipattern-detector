@@ -14,8 +14,17 @@ Proof-of-concept implementation for MSc dissertation demonstrating multi-tool in
 - **Precision: 100%** (validated - no false positives)
 - **Recall: 66.7%** (validated - 4 of 6 patterns detected)
 - **F1-Score: 80%** (validated)
-- **Cost Reduction: 40%** (estimated)
+- **Cost: ~£0.04 per analysis** (projected from AWS serverless pricing; ~£42/year for 20 analyses a week vs £500+ for dedicated infrastructure)
 
+
+## Presentation & Viva Materials
+Interactive pages used to present and defend this dissertation, in [`presentation/`](presentation/):
+
+- **[Start page](https://mahyadmi.github.io/microservice-antipattern-detector/presentation/)**: links to everything below
+- **[Viva slides](https://mahyadmi.github.io/microservice-antipattern-detector/presentation/viva-presentation.html)**: 7-slide deck
+- **[One-page summary](https://mahyadmi.github.io/microservice-antipattern-detector/presentation/viva-summary.html)**: problem → solution → results
+- **[Architecture demo](https://mahyadmi.github.io/microservice-antipattern-detector/presentation/demo-architecture.html)**: containers, detection flow, results
+- **[Semantic similarity explained](https://mahyadmi.github.io/microservice-antipattern-detector/presentation/semantic-similarity.html)**: how duplicate findings are matched
 
 ## Setup
 1. Clone repository
